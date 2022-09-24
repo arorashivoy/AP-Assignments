@@ -1,0 +1,185 @@
+import java.util.*;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.lang.IndexOutOfBoundsException;
+
+@SuppressWarnings("unused")
+public class Company {
+    // Company Info
+    private String name;
+    private String role;
+    private float ctc;
+    private float CGPA_Req;
+    private Date registeringDate = null;
+
+    private PlacementCell placementCell;
+
+    private ArrayList<Student> appliedStudents = new ArrayList<>();
+    private ArrayList<Student> offeredStudents = new ArrayList<>();
+    private ArrayList<Student> acceptedStudents = new ArrayList<>();
+
+    // Objects
+    Scanner input = new Scanner(System.in);
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy HH:mm");
+    Random rend = new Random();
+
+    /**
+     * Company constructor
+     * 
+     * @param name          Name of the company
+     * @param role          role that the company is offering
+     * @param ctc           ctc offered by the company
+     * @param CGPA_Req      required CGPA to apply for the company
+     * @param placementCell placement cell under which the company comes
+     */
+    Company(String name, String role, float ctc, float CGPA_Req, PlacementCell placementCell) {
+        this.name = name;
+        this.role = role;
+        this.ctc = ctc;
+        this.CGPA_Req = CGPA_Req;
+        this.placementCell = placementCell;
+    }
+
+    /**
+     * Input the registration date and register the company for placement drive
+     */
+    public void registeredForPlacement() {
+        if (registeringDate != null) {
+            while (true) {
+                System.out.print("Enter the registering Date and time (DD/MM/YY HH:MM): ");
+                String in = input.nextLine();
+
+                try {
+                    registeringDate = formatter.parse(in);
+                } catch (ParseException p) {
+                    System.out.println("Enter a valid date format\nTry Again!!!");
+                    continue;
+                }
+
+                // Start date is not after end date
+                if (registeringDate.compareTo(placementCell.getCompanyEnd()) > 0) {
+                    System.out.println("Registration date has been passed");
+                    break;
+                }
+
+                // If student registration start before company
+                if (registeringDate.compareTo(placementCell.getCompanyStart()) < 0) {
+                    System.out.println(
+                            "Registrations has not started yet\nTry Again!!!");
+                    continue;
+                }
+
+                placementCell.addCompany(this);
+
+                break;
+            }
+        }
+    }
+
+    /**
+     * Get a list of selected students
+     */
+    public void getSelectedStudent() {
+        if (this.acceptedStudents.size() == 0) {
+            System.out.println("No student has been offered");
+            return;
+        } else {
+            System.out.println("The following students have been selected");
+            for (Student s : this.acceptedStudents) {
+                System.out.println("\t" + s.getName());
+            }
+        }
+    }
+
+    public void updateRole(String role) {
+        this.role = role;
+    }
+
+    public void updateCTC(float ctc) {
+        this.ctc = ctc;
+    }
+
+    public void updateCGPA_Req(float CGPA_Req) {
+        this.CGPA_Req = CGPA_Req;
+    }
+
+    /**
+     * Select some random students
+     */
+    public void selectStudent() {
+        for (Student i : this.appliedStudents) {
+            if (rend.nextInt(3) == 1) {
+                this.offeredStudents.add(i);
+                i.setOffered(true);
+                i.setCompanyStatus(this, 0);
+            }
+        }
+
+        if (this.offeredStudents.size() == 0) {
+            try {
+                this.offeredStudents.add(this.appliedStudents.get(0));
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println("No student has applied");
+            }
+        }
+    }
+
+    ////////////////////////////// MENU OPTIONS ////////////////////////////////
+    /**
+     * Company specific menu where you select options for a particular company only
+     * 
+     * @return true, to show the menu again else, false
+     */
+    public Boolean companyMenu() {
+        System.out.println("\n\nWelcome " + this.name);
+        System.out.println("\tPRESS 1:\tTo update Role");
+        System.out.println("\tPRESS 2:\tTo update Package");
+        System.out.println("\tPRESS 3:\tTo update CGPA criteria");
+        System.out.println("\tPRESS 4:\tTo Register for Institute Placement Drive");
+        System.out.println("\tPRESS 5:\tTo go Back");
+        System.out.print("Enter your choice: ");
+        int a = input.nextInt();
+
+        switch (a) {
+            case 1:
+                System.out.print("Enter the new Role: ");
+                String role = input.nextLine().strip();
+                this.updateRole(role);
+                System.out.println("Role has been updated to " + role);
+                return true;
+            case 2:
+                System.out.print("Enter the new Package(in LPA): ");
+                float _package = input.nextFloat();
+                this.updateCTC(_package);
+                System.out.println("Package  has been updated to " + _package);
+                return true;
+            case 3:
+                System.out.print("Enter the new CGPA Criterial: ");
+                float _cgpa = input.nextFloat();
+                this.updateCGPA_Req(_cgpa);
+                System.out.println("CGPA criteria has been updated to " + _cgpa);
+            case 4:
+                this.registeredForPlacement();
+                return true;
+            case 5:
+                return false;
+            default:
+                System.out.println("Enter correct option\nTry Again!!!");
+                return true;
+        }
+    }
+
+    ////////////////////////// Getters and Setters /////////////////////////////
+    public String getName() {
+        return this.name;
+    }
+
+    public float getCTC() {
+        return this.ctc;
+    }
+
+    public float getCGPA_Req() {
+        return this.CGPA_Req;
+    }
+}
