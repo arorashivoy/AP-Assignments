@@ -15,6 +15,7 @@ public class Company {
 
     private PlacementCell placementCell;
 
+    // Students Array List
     private ArrayList<Student> appliedStudents = new ArrayList<>();
     private ArrayList<Student> offeredStudents = new ArrayList<>();
     private ArrayList<Student> acceptedStudents = new ArrayList<>();
@@ -44,7 +45,7 @@ public class Company {
     /**
      * Input the registration date and register the company for placement drive
      */
-    public void registeredForPlacement() {
+    public void registerForPlacement() {
         if (registeringDate != null) {
             while (true) {
                 System.out.print("Enter the registering Date and time (DD/MM/YY HH:MM): ");
@@ -160,7 +161,7 @@ public class Company {
                 this.updateCGPA_Req(_cgpa);
                 System.out.println("CGPA criteria has been updated to " + _cgpa);
             case 4:
-                this.registeredForPlacement();
+                this.registerForPlacement();
                 return true;
             case 5:
                 return false;

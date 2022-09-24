@@ -18,7 +18,7 @@ public class Student {
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy HH:mm");
 
     // Student placement status
-    HashMap<Company, companyStatus> companies = new HashMap<>();
+    HashMap<Company, CompanyStatus> companies = new HashMap<>();
     private boolean registeredForPlacement = false;
     private boolean offered = false;
     private boolean placed = false;
@@ -85,27 +85,36 @@ public class Student {
 
     public void registerForCompany(Company company) {
         // TODO change in company's list of students
-        if (this.companies.get(company) != null && this.companies.get(company) == companyStatus.NOT_APPLIED
+        if (this.companies.get(company) != null && this.companies.get(company) == CompanyStatus.NOT_APPLIED
                 && company.getCTC() >= 3 * this.highestCTC && !this.placed) {
-            this.companies.put(company, companyStatus.APPLIED);
+            this.companies.put(company, CompanyStatus.APPLIED);
         }
     }
 
     /**
      * Get a list of all the available companies
+     * 
+     * @return LinkedList of all the available companies
      */
-    public void getAvailableCompany() {
+    public ArrayList<Company> getAvailableCompany() {
         boolean flag = false;
+        System.out.println("Available Companies:");
+        int i = 1;
+        ArrayList<Company> compObjects = new ArrayList<>();
         for (Company company : this.companies.keySet()) {
-            if (this.companies.get(company) == companyStatus.NOT_APPLIED) {
+            if (this.companies.get(company) == CompanyStatus.NOT_APPLIED) {
                 flag = true;
-                System.out.println(company.getName());
+                System.out.println("\t" + i + ") " + company.getName());
+                compObjects.add(company);
+                i += 1;
             }
         }
 
         if (!flag) {
-            System.out.println("unavailable");
+            System.out.println("No Companies Available");
         }
+
+        return compObjects;
     }
 
     /**
@@ -144,13 +153,13 @@ public class Student {
         for (Company company : placementCell.getCompanies().values()) {
             // TODO add student to company's list of students
             if (this.CGPA < company.getCGPA_Req()) {
-                companies.put(company, companyStatus.NOT_ELIGIBLE);
+                companies.put(company, CompanyStatus.NOT_ELIGIBLE);
             } else {
-                if (companies.getOrDefault(company, companyStatus.NOT_ELIGIBLE) != companyStatus.OFFERED
-                        || companies.getOrDefault(company, companyStatus.NOT_ELIGIBLE) != companyStatus.PLACED
-                        || companies.getOrDefault(company, companyStatus.NOT_ELIGIBLE) != companyStatus.REJECTED
-                        || companies.getOrDefault(company, companyStatus.NOT_ELIGIBLE) != companyStatus.APPLIED)
-                    companies.put(company, companyStatus.NOT_APPLIED);
+                if (companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.OFFERED
+                        || companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.PLACED
+                        || companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.REJECTED
+                        || companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.APPLIED)
+                    companies.put(company, CompanyStatus.NOT_APPLIED);
             }
         }
 
@@ -164,7 +173,7 @@ public class Student {
         this.highestCTC = 0;
         this.highestCTCCompany = null;
         for (Company company : companies.keySet()) {
-            if (companies.get(company) == companyStatus.OFFERED && company.getCTC() >= this.highestCTC) {
+            if (companies.get(company) == CompanyStatus.OFFERED && company.getCTC() >= this.highestCTC) {
                 this.highestCTC = company.getCTC();
                 this.highestCTCCompany = company;
             }
@@ -178,7 +187,7 @@ public class Student {
         this.placed = true;
         PlacementCell.numPlaced += 1;
         // TODO Do for company
-        companies.put(highestCTCCompany, companyStatus.PLACED);
+        companies.put(highestCTCCompany, CompanyStatus.PLACED);
     }
 
     /**
@@ -186,7 +195,7 @@ public class Student {
      */
     public void rejectOffer() {
         // TODO Do for company
-        companies.put(highestCTCCompany, companyStatus.REJECTED);
+        companies.put(highestCTCCompany, CompanyStatus.REJECTED);
         updateOffer();
 
         // If rejected all the offers
@@ -195,12 +204,66 @@ public class Student {
             PlacementCell.numBlocked += 1;
 
             for (Company company : placementCell.getCompanies().values()) {
-                companies.put(company, companyStatus.NOT_ELIGIBLE);
+                companies.put(company, CompanyStatus.NOT_ELIGIBLE);
             }
 
             System.out.println("BLOCKED");
         }
 
+    }
+
+    ////////////////////////////// MENU OPTIONS ////////////////////////////////
+    public Boolean studentMenu() {
+        System.out.println("\n\nWelcome " + this.name);
+        System.out.println("\tPRESS 1:\tTo Register for Placement Drive");
+        System.out.println("\tPRESS 2:\tTo Register for Company");
+        System.out.println("\tPRESS 3:\tTo get all available Companies");
+        System.out.println("\tPRESS 4:\tTo get Current Status");
+        System.out.println("\tPRESS 5:\tTo Update CGPA");
+        System.out.println("\tPRESS 6:\tTo Accept offer");
+        System.out.println("\tPRESS 7:\tTo Reject offer");
+        System.out.println("\tPRESS 8:\tTo go Back");
+        int a = input.nextInt();
+
+        switch (a) {
+            case 1:
+                this.registerForPlacement();
+                return true;
+            case 2:
+                System.out.print("Choose to register for the ");
+                ArrayList<Company> compObject = this.getAvailableCompany();
+
+                Company selectedCompany = null;
+                int b = input.nextInt();
+
+                try {
+                    selectedCompany = compObject.get(b - 1);
+                } catch (IndexOutOfBoundsException e) {
+                    System.out.println("Enter correct option\nTry Again!!!");
+                    return true;
+                }
+
+                this.registerForCompany(selectedCompany);
+                return true;
+            case 3:
+                this.getAvailableCompany();
+                return true;
+            case 4:
+                this.getCurrentStatus(false);
+                return true;
+            case 5:
+            case 6:
+                this.acceptOffer();
+                return true;
+            case 7:
+                this.rejectOffer();
+                return true;
+            case 8:
+                return false;
+            default:
+                System.out.println("Enter correct option\nTry Again!!!");
+                return true;
+        }
     }
 
     ////////////////////////// Getters and Setters /////////////////////////////
@@ -219,22 +282,22 @@ public class Student {
     public void setCompanyStatus(Company company, int status) {
         switch (status) {
             case 0:
-                companies.put(company, companyStatus.OFFERED);
+                companies.put(company, CompanyStatus.OFFERED);
                 break;
             case 1:
-                companies.put(company, companyStatus.APPLIED);
+                companies.put(company, CompanyStatus.APPLIED);
                 break;
             case 2:
-                companies.put(company, companyStatus.NOT_APPLIED);
+                companies.put(company, CompanyStatus.NOT_APPLIED);
                 break;
             case 3:
-                companies.put(company, companyStatus.PLACED);
+                companies.put(company, CompanyStatus.PLACED);
                 break;
             case 4:
-                companies.put(company, companyStatus.NOT_ELIGIBLE);
+                companies.put(company, CompanyStatus.NOT_ELIGIBLE);
                 break;
             case 5:
-                companies.put(company, companyStatus.REJECTED);
+                companies.put(company, CompanyStatus.REJECTED);
                 break;
             default:
         }
@@ -244,7 +307,7 @@ public class Student {
     /**
      * Status of a company for a student
      */
-    private enum companyStatus {
+    private enum CompanyStatus {
         OFFERED, APPLIED, NOT_APPLIED, PLACED, NOT_ELIGIBLE, REJECTED
     }
 }
