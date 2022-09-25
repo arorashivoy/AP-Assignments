@@ -111,10 +111,10 @@ public class Student {
             try {
                 if (e.getValue() == CompanyStatus.NOT_APPLIED) {
                     flag = true;
-                    System.out.println("\t" + i + ")\tName:\t\t" + e.getKey().getName());
-                    System.out.println("\t\tRole:\t\t" + e.getKey().getRole());
+                    System.out.println("\t" + i + ")\tName:\t\t  " + e.getKey().getName());
+                    System.out.println("\t\tRole:\t\t  " + e.getKey().getRole());
                     System.out.println("\t\tCTC:\t\t" + e.getKey().getCTC());
-                    System.out.println("\t\tCGPA Requirement:\t" + e.getKey().getCGPA_Req());
+                    System.out.println("\t\tCGPA Requirement: " + e.getKey().getCGPA_Req());
                     compObjects.add(e.getKey());
                     i += 1;
 
@@ -246,6 +246,7 @@ public class Student {
                 float newCGPA = input.nextFloat();
                 input.nextLine();
                 placementCell.updateStudentCGPA(this, CGPA, newCGPA);
+                return true;
             case 6:
                 this.acceptOffer();
                 return true;
