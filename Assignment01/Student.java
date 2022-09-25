@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Map.Entry;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -84,10 +85,12 @@ public class Student {
     }
 
     public void registerForCompany(Company company) {
-        // TODO change in company's list of students
         if (this.companies.get(company) != null && this.companies.get(company) == CompanyStatus.NOT_APPLIED
                 && company.getCTC() >= 3 * this.highestCTC && !this.placed) {
             this.companies.put(company, CompanyStatus.APPLIED);
+            company.addAppliedStudent(this);
+        } else {
+            System.out.println("You cannot apply to the company " + company.getName());
         }
     }
 
@@ -101,13 +104,19 @@ public class Student {
         System.out.println("Available Companies:");
         int i = 1;
         ArrayList<Company> compObjects = new ArrayList<>();
-        for (Company company : this.companies.keySet()) {
-            if (this.companies.get(company) == CompanyStatus.NOT_APPLIED) {
-                flag = true;
-                System.out.println("\t" + i + ") " + company.getName());
-                compObjects.add(company);
-                i += 1;
+        for (Entry<Company, CompanyStatus> e : this.companies.entrySet()) {
+            try {
+                if (e.getValue() == CompanyStatus.NOT_APPLIED) {
+                    flag = true;
+                    System.out.println("\t" + i + ") " + e.getKey().getName());
+                    compObjects.add(e.getKey());
+                    i += 1;
+
+                }
+            } catch (IllegalStateException error) {
+                continue;
             }
+
         }
 
         if (!flag) {
@@ -123,6 +132,7 @@ public class Student {
      * @param thirdPerson whether to show the result in third person or not
      */
     public void getCurrentStatus(boolean thirdPerson) {
+        placementCell.getCompaniesResult();
         if (this.blocked) {
             System.out.println((thirdPerson ? (this.name + "is ") : "You are ") + "blocked from placement");
         } else if (placed) {
@@ -147,55 +157,21 @@ public class Student {
     }
 
     /**
-     * Update the status of each company based on CGPA
-     */
-    private void updateCompaniesStatus() {
-        for (Company company : placementCell.getCompanies().values()) {
-            // TODO add student to company's list of students
-            if (this.CGPA < company.getCGPA_Req()) {
-                companies.put(company, CompanyStatus.NOT_ELIGIBLE);
-            } else {
-                if (companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.OFFERED
-                        || companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.PLACED
-                        || companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.REJECTED
-                        || companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.APPLIED)
-                    companies.put(company, CompanyStatus.NOT_APPLIED);
-            }
-        }
-
-        updateOffer();
-    }
-
-    /**
-     * Update the highest offer
-     */
-    private void updateOffer() {
-        this.highestCTC = 0;
-        this.highestCTCCompany = null;
-        for (Company company : companies.keySet()) {
-            if (companies.get(company) == CompanyStatus.OFFERED && company.getCTC() >= this.highestCTC) {
-                this.highestCTC = company.getCTC();
-                this.highestCTCCompany = company;
-            }
-        }
-    }
-
-    /**
      * Accept the offer
      */
     public void acceptOffer() {
         this.placed = true;
         PlacementCell.numPlaced += 1;
-        // TODO Do for company
         companies.put(highestCTCCompany, CompanyStatus.PLACED);
+        highestCTCCompany.offerAccepted(this);
     }
 
     /**
      * Reject the offer
      */
     public void rejectOffer() {
-        // TODO Do for company
         companies.put(highestCTCCompany, CompanyStatus.REJECTED);
+        highestCTCCompany.offerRejected(this);
         updateOffer();
 
         // If rejected all the offers
@@ -252,6 +228,9 @@ public class Student {
                 this.getCurrentStatus(false);
                 return true;
             case 5:
+                System.out.print("Enter the new CGPA: ");
+                float newCGPA = input.nextFloat();
+                placementCell.updateStudentCGPA(this, CGPA, newCGPA);
             case 6:
                 this.acceptOffer();
                 return true;
@@ -275,32 +254,17 @@ public class Student {
         return this.rollNo;
     }
 
-    public void setOffered(Boolean offered) {
+    public void setOffered(Company company, Boolean offered) {
         this.offered = offered;
+        companies.put(company, CompanyStatus.OFFERED);
     }
 
-    public void setCompanyStatus(Company company, int status) {
-        switch (status) {
-            case 0:
-                companies.put(company, CompanyStatus.OFFERED);
-                break;
-            case 1:
-                companies.put(company, CompanyStatus.APPLIED);
-                break;
-            case 2:
-                companies.put(company, CompanyStatus.NOT_APPLIED);
-                break;
-            case 3:
-                companies.put(company, CompanyStatus.PLACED);
-                break;
-            case 4:
-                companies.put(company, CompanyStatus.NOT_ELIGIBLE);
-                break;
-            case 5:
-                companies.put(company, CompanyStatus.REJECTED);
-                break;
-            default:
-        }
+    public float getCGPA() {
+        return this.CGPA;
+    }
+
+    public void setCGPA(float newCGPA) {
+        this.CGPA = newCGPA;
     }
 
     ///////////////////////////////// HELPERS //////////////////////////////////
@@ -310,4 +274,44 @@ public class Student {
     private enum CompanyStatus {
         OFFERED, APPLIED, NOT_APPLIED, PLACED, NOT_ELIGIBLE, REJECTED
     }
+
+    /**
+     * Update the status of each company based on CGPA
+     */
+    public void updateCompaniesStatus() {
+        for (Company company : placementCell.getCompanies().values()) {
+            if (this.CGPA < company.getCGPA_Req()) {
+                companies.put(company, CompanyStatus.NOT_ELIGIBLE);
+            } else {
+                if (companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.OFFERED
+                        && companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.PLACED
+                        && companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.REJECTED
+                        && companies.getOrDefault(company, CompanyStatus.NOT_ELIGIBLE) != CompanyStatus.APPLIED)
+                    companies.put(company, CompanyStatus.NOT_APPLIED);
+            }
+        }
+
+        updateOffer();
+    }
+
+    /**
+     * Update the highest offer
+     */
+    private void updateOffer() {
+        this.highestCTC = 0;
+        this.highestCTCCompany = null;
+        for (Entry<Company, CompanyStatus> e : this.companies.entrySet()) {
+            if (e.getValue() == CompanyStatus.OFFERED && e.getKey().getCTC() >= this.highestCTC) {
+                this.highestCTC = e.getKey().getCTC();
+                this.highestCTCCompany = e.getKey();
+            }
+        }
+
+        if (highestCTCCompany == null) {
+            this.offered = false;
+        } else {
+            this.offered = true;
+        }
+    }
+
 }

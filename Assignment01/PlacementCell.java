@@ -136,10 +136,6 @@ public class PlacementCell {
         student.getCurrentStatus(true);
     }
 
-    public void getCompanyDetail(Company company) {
-        // TODO Complete this
-    }
-
     public void getAvgPackage() {
         float sum = 0;
         for (Company company : companies.values()) {
@@ -149,8 +145,22 @@ public class PlacementCell {
         System.out.println("The average package is " + sum / companies.size());
     }
 
-    public void getCompanyResult() {
-        // TODO Complete this
+    public void updateStudentCGPA(Student s, float oldCGPA, float newCGPA) {
+        if (oldCGPA == s.getCGPA()) {
+            s.setCGPA(newCGPA);
+            s.updateCompaniesStatus();
+        } else {
+            System.out.println("Wrong old CGPA inputted by the student");
+        }
+    }
+
+    /**
+     * Select some students from all the companies
+     */
+    public void getCompaniesResult() {
+        for (Company c : companies.values()) {
+            c.selectStudents();
+        }
     }
 
     ////////////////////////////// MENU OPTIONS ////////////////////////////////
@@ -209,14 +219,24 @@ public class PlacementCell {
                     System.out.println("Record does not exist");
                     return true;
                 }
-                this.getCompanyDetail(c);
+                c.printCompanyDetails();
                 return true;
 
             case 8:
                 this.getAvgPackage();
                 return true;
             case 9:
-                this.getCompanyResult();
+                System.out.print("\nEnter the Number of the Company whose result you want to see: ");
+                String e = input.nextLine();
+                Company comp = companies.get(e.strip());
+                if (comp == null) {
+                    System.out.println("Record does not exist");
+                    return true;
+                }
+                comp.selectStudents();
+                if (comp.hasSelectedStudents()) {
+                    comp.printSelectedStudents();
+                }
                 return true;
             case 10:
                 return false;

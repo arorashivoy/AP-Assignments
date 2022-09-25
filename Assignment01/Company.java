@@ -13,12 +13,14 @@ public class Company {
     private float CGPA_Req;
     private Date registeringDate = null;
 
+    private Boolean selectedStudents = false;
+
     private PlacementCell placementCell;
 
     // Students Array List
     private ArrayList<Student> appliedStudents = new ArrayList<>();
-    private ArrayList<Student> offeredStudents = new ArrayList<>();
-    private ArrayList<Student> acceptedStudents = new ArrayList<>();
+    private HashSet<Student> offeredStudents = new HashSet<>();
+    private HashSet<Student> acceptedStudents = new HashSet<>();
 
     // Objects
     Scanner input = new Scanner(System.in);
@@ -108,20 +110,57 @@ public class Company {
     /**
      * Select some random students
      */
-    public void selectStudent() {
-        for (Student i : this.appliedStudents) {
+    public void selectStudents() {
+        if (selectedStudents) {
+            return;
+        }
+        selectedStudents = true;
+
+        for (int i = 0; i < this.appliedStudents.size(); i++) {
             if (rend.nextInt(3) == 1) {
-                this.offeredStudents.add(i);
-                i.setOffered(true);
-                i.setCompanyStatus(this, 0);
+                this.offeredStudents.add(this.appliedStudents.get(i));
+                this.appliedStudents.get(i).setOffered(this, true);
+                this.appliedStudents.remove(i);
             }
         }
 
         if (this.offeredStudents.size() == 0) {
             try {
                 this.offeredStudents.add(this.appliedStudents.get(0));
+                this.appliedStudents.get(0).setOffered(this, true);
+                this.appliedStudents.remove(0);
             } catch (IndexOutOfBoundsException e) {
                 System.out.println("No student has applied");
+                selectedStudents = false;
+            }
+        }
+    }
+
+    public void printSelectedStudents() {
+        if (this.offeredStudents.size() > 0 || this.acceptedStudents.size() > 0) {
+            int i = 1;
+            System.out.println("The company has selected the following student:- ");
+            for (Student s : this.acceptedStudents) {
+                System.out.println("\t" + i + ") " + s.getName() + " (" + s.getRollNo() + ") has been placed");
+                i += 1;
+            }
+            for (Student s : this.offeredStudents) {
+                System.out.println("\t" + i + ") " + s.getName() + " (" + s.getRollNo() + ") has been offered");
+                i += 1;
+            }
+        }
+    }
+
+    public void printCompanyDetails() {
+        System.out.println("The Role offered by the company is " + this.role);
+        System.out.println("The CTC offered by the company is (in LPA) " + this.ctc);
+        System.out.println("The Required CGPA to apply for the company is " + this.CGPA_Req);
+        if (this.offeredStudents.size() > 0) {
+            int i = 1;
+            System.out.println("The company has given offers to the following student:- ");
+            for (Student s : this.offeredStudents) {
+                System.out.println("\t" + i + ") " + s.getName() + " (" + s.getRollNo() + ")");
+                i += 1;
             }
         }
     }
@@ -182,5 +221,22 @@ public class Company {
 
     public float getCGPA_Req() {
         return this.CGPA_Req;
+    }
+
+    public Boolean hasSelectedStudents() {
+        return this.selectedStudents;
+    }
+
+    public void addAppliedStudent(Student s) {
+        this.appliedStudents.add(s);
+    }
+
+    public void offerAccepted(Student s) {
+        this.offeredStudents.remove(s);
+        this.acceptedStudents.add(s);
+    }
+
+    public void offerRejected(Student s) {
+        this.offeredStudents.remove(s);
     }
 }
