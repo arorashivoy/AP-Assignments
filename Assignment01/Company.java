@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.lang.IndexOutOfBoundsException;
 
-@SuppressWarnings("unused")
 public class Company {
     // Company Info
     private String name;
@@ -48,7 +47,7 @@ public class Company {
      * Input the registration date and register the company for placement drive
      */
     public void registerForPlacement() {
-        if (registeringDate != null) {
+        if (registeringDate == null) {
             while (true) {
                 System.out.print("Enter the registering Date and time (DD/MM/YY HH:MM): ");
                 String in = input.nextLine();
@@ -77,6 +76,9 @@ public class Company {
 
                 break;
             }
+            System.out.println("Successfully Registered for the Placement Drive");
+        } else {
+            System.out.println("Company is already registered for Placements");
         }
     }
 
@@ -89,8 +91,14 @@ public class Company {
             return;
         } else {
             System.out.println("The following students have been selected");
+            int i = 1;
             for (Student s : this.acceptedStudents) {
-                System.out.println("\t" + s.getName());
+                System.out.println("\t" + i + ") Name:\t" + s.getName());
+                System.out.println("\t" + i + ") Roll No.:\t" + s.getRollNo());
+                System.out.println("\t" + i + ") CGPA:\t" + s.getCGPA());
+                System.out.println("\t" + i + ") Branch:\t" + s.getBranch());
+
+                i += 1;
             }
         }
     }
@@ -119,7 +127,7 @@ public class Company {
         for (int i = 0; i < this.appliedStudents.size(); i++) {
             if (rend.nextInt(3) == 1) {
                 this.offeredStudents.add(this.appliedStudents.get(i));
-                this.appliedStudents.get(i).setOffered(this, true);
+                this.appliedStudents.get(i).setOffered(this);
                 this.appliedStudents.remove(i);
             }
         }
@@ -127,7 +135,7 @@ public class Company {
         if (this.offeredStudents.size() == 0) {
             try {
                 this.offeredStudents.add(this.appliedStudents.get(0));
-                this.appliedStudents.get(0).setOffered(this, true);
+                this.appliedStudents.get(0).setOffered(this);
                 this.appliedStudents.remove(0);
             } catch (IndexOutOfBoundsException e) {
                 System.out.println("No student has applied");
@@ -180,6 +188,7 @@ public class Company {
         System.out.println("\tPRESS 5:\tTo go Back");
         System.out.print("Enter your choice: ");
         int a = input.nextInt();
+        input.nextLine();
 
         switch (a) {
             case 1:
@@ -191,12 +200,14 @@ public class Company {
             case 2:
                 System.out.print("Enter the new Package(in LPA): ");
                 float _package = input.nextFloat();
+                input.nextLine();
                 this.updateCTC(_package);
                 System.out.println("Package  has been updated to " + _package);
                 return true;
             case 3:
                 System.out.print("Enter the new CGPA Criterial: ");
                 float _cgpa = input.nextFloat();
+                input.nextLine();
                 this.updateCGPA_Req(_cgpa);
                 System.out.println("CGPA criteria has been updated to " + _cgpa);
             case 4:
@@ -238,5 +249,9 @@ public class Company {
 
     public void offerRejected(Student s) {
         this.offeredStudents.remove(s);
+    }
+
+    public String getRole() {
+        return this.role;
     }
 }

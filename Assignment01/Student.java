@@ -3,7 +3,6 @@ import java.util.Map.Entry;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-@SuppressWarnings("unused")
 public class Student {
     // Student Info
     private String name;
@@ -50,7 +49,7 @@ public class Student {
      * Method to register a student for placement
      */
     public void registerForPlacement() {
-        if (registeringDate != null) {
+        if (registeringDate == null) {
             while (true) {
                 System.out.print("Enter the registering Date and time (DD/MM/YY HH:MM): ");
                 String in = input.nextLine();
@@ -81,6 +80,9 @@ public class Student {
 
                 break;
             }
+            System.out.println("Successfully Registered for the Placement Drive");
+        } else {
+            System.out.println("Student is already registered for Placements");
         }
     }
 
@@ -89,6 +91,7 @@ public class Student {
                 && company.getCTC() >= 3 * this.highestCTC && !this.placed) {
             this.companies.put(company, CompanyStatus.APPLIED);
             company.addAppliedStudent(this);
+            System.out.println("You have successfully registered for the company " + company.getName());
         } else {
             System.out.println("You cannot apply to the company " + company.getName());
         }
@@ -108,7 +111,10 @@ public class Student {
             try {
                 if (e.getValue() == CompanyStatus.NOT_APPLIED) {
                     flag = true;
-                    System.out.println("\t" + i + ") " + e.getKey().getName());
+                    System.out.println("\t" + i + ")\tName:\t\t" + e.getKey().getName());
+                    System.out.println("\t\tRole:\t\t" + e.getKey().getRole());
+                    System.out.println("\t\tCTC:\t\t" + e.getKey().getCTC());
+                    System.out.println("\t\tCGPA Requirement:\t" + e.getKey().getCGPA_Req());
                     compObjects.add(e.getKey());
                     i += 1;
 
@@ -164,6 +170,8 @@ public class Student {
         PlacementCell.numPlaced += 1;
         companies.put(highestCTCCompany, CompanyStatus.PLACED);
         highestCTCCompany.offerAccepted(this);
+
+        System.out.println("You have accepted the offer by " + highestCTCCompany.getName());
     }
 
     /**
@@ -172,6 +180,8 @@ public class Student {
     public void rejectOffer() {
         companies.put(highestCTCCompany, CompanyStatus.REJECTED);
         highestCTCCompany.offerRejected(this);
+
+        System.out.println("You have rejected the offer by " + highestCTCCompany.getName());
         updateOffer();
 
         // If rejected all the offers
@@ -183,7 +193,7 @@ public class Student {
                 companies.put(company, CompanyStatus.NOT_ELIGIBLE);
             }
 
-            System.out.println("BLOCKED");
+            System.out.println("You are BLOCKED from Placement Drive");
         }
 
     }
@@ -199,7 +209,9 @@ public class Student {
         System.out.println("\tPRESS 6:\tTo Accept offer");
         System.out.println("\tPRESS 7:\tTo Reject offer");
         System.out.println("\tPRESS 8:\tTo go Back");
+        System.out.print("Enter your choice: ");
         int a = input.nextInt();
+        input.nextLine();
 
         switch (a) {
             case 1:
@@ -209,8 +221,10 @@ public class Student {
                 System.out.print("Choose to register for the ");
                 ArrayList<Company> compObject = this.getAvailableCompany();
 
+                System.out.print("Enter your choice: ");
                 Company selectedCompany = null;
                 int b = input.nextInt();
+                input.nextLine();
 
                 try {
                     selectedCompany = compObject.get(b - 1);
@@ -230,6 +244,7 @@ public class Student {
             case 5:
                 System.out.print("Enter the new CGPA: ");
                 float newCGPA = input.nextFloat();
+                input.nextLine();
                 placementCell.updateStudentCGPA(this, CGPA, newCGPA);
             case 6:
                 this.acceptOffer();
@@ -254,9 +269,11 @@ public class Student {
         return this.rollNo;
     }
 
-    public void setOffered(Company company, Boolean offered) {
-        this.offered = offered;
+    public void setOffered(Company company) {
+        this.offered = true;
         companies.put(company, CompanyStatus.OFFERED);
+
+        this.updateOffer();
     }
 
     public float getCGPA() {
@@ -265,6 +282,10 @@ public class Student {
 
     public void setCGPA(float newCGPA) {
         this.CGPA = newCGPA;
+    }
+
+    public String getBranch() {
+        return this.branch;
     }
 
     ///////////////////////////////// HELPERS //////////////////////////////////

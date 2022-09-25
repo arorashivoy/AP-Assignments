@@ -25,6 +25,7 @@ public class FutureBuilder {
             System.out.println("\tPRESS 2: To Exit the Application");
             System.out.print("Enter your choice: ");
             int a = input.nextInt();
+            input.nextLine();
 
             if (a == 1) {
                 insideApp = true;
@@ -39,12 +40,13 @@ public class FutureBuilder {
             // Mode entering menu
             while (insideApp) {
                 System.out.println("\n\nChoose the mode you want to Enter in");
-                System.out.println("PRESS 1:\tTo Enter as Student Mode");
-                System.out.println("PRESS 2:\tTo Enter as Company Mode");
-                System.out.println("PRESS 3:\tTo Enter as Placement Cell Mode");
-                System.out.println("PRESS 4:\tTo Return to the Main Menu");
+                System.out.println("\tPRESS 1:\tTo Enter as Student Mode");
+                System.out.println("\tPRESS 2:\tTo Enter as Company Mode");
+                System.out.println("\tPRESS 3:\tTo Enter as Placement Cell Mode");
+                System.out.println("\tPRESS 4:\tTo Return to the Main Menu");
                 System.out.print("Enter your choice: ");
                 a = input.nextInt();
+                input.nextLine();
                 if (a == 1) {
                     studentMode = true;
                     while (studentMode) {
@@ -86,6 +88,7 @@ public class FutureBuilder {
         System.out.println("\tPRESS 4: To go back");
         System.out.print("Enter your choice: ");
         int a = input.nextInt();
+        input.nextLine();
         switch (a) {
             case 1:
                 System.out.print("Enter the name of the Company: ");
@@ -94,8 +97,10 @@ public class FutureBuilder {
                 String role = input.nextLine().strip();
                 System.out.print("Enter the CTC(in LPA) of the Company: ");
                 float ctc = input.nextFloat();
+                input.nextLine();
                 System.out.print("Enter the Require CGPA to apply for the Company: ");
                 float cgpa = input.nextFloat();
+                input.nextLine();
 
                 if (FutureBuilder.companies.get(name) != null) {
                     System.out.println("The company already exists");
@@ -110,7 +115,9 @@ public class FutureBuilder {
                 ArrayList<Company> companyObjects = getAvailableCompany();
 
                 Company selectedCompany = null;
+                System.out.print("Enter your choice: ");
                 int b = input.nextInt();
+                input.nextLine();
                 try {
                     selectedCompany = companyObjects.get(b - 1);
                 } catch (IndexOutOfBoundsException e) {
@@ -149,6 +156,7 @@ public class FutureBuilder {
         System.out.print("Enter your Choice: ");
 
         int a = input.nextInt();
+        input.nextLine();
         switch (a) {
             case 1:
                 System.out.print("Enter the Roll Number of the Student: ");
@@ -174,6 +182,7 @@ public class FutureBuilder {
                 String branch = input.nextLine().strip();
                 System.out.print("Enter the CGPA to apply of the Student: ");
                 float cgpa = input.nextFloat();
+                input.nextLine();
 
                 if (FutureBuilder.students.get(rollNo) != null) {
                     System.out.println("The student already exists");

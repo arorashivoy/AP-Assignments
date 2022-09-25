@@ -183,6 +183,7 @@ public class PlacementCell {
         System.out.println("\tPRESS 10:\tTo go Back");
         System.out.print("Enter your choice: ");
         int a = input.nextInt();
+        input.nextLine();
         switch (a) {
             case 1:
                 this.openStudentRegistration();
@@ -212,7 +213,7 @@ public class PlacementCell {
                 return true;
 
             case 7:
-                System.out.print("\nEnter the Number of the Company whose detail you want to see: ");
+                System.out.print("\nEnter the Name of the Company whose detail you want to see: ");
                 String d = input.nextLine();
                 Company c = companies.get(d.strip());
                 if (c == null) {
