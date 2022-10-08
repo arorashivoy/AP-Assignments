@@ -1,34 +1,173 @@
-import java.io.PipedInputStream;
 import java.util.*;
 
-@SuppressWarnings("unused")
 public abstract class Customer {
-    private String name;
-    private int age;
-    private String phNo;
-    private String email;
-    private String password;
-    private int discount;
+    protected String name;
+    protected int age;
+    protected String phNo;
+    protected String email;
+    protected String password;
+    protected CustomerStatus status;
 
-    PriorityQueue<Integer> coupons = new PriorityQueue<>(new ReverseComparator());
+    static final float normal = 0f;
+    static final float prime = 200f;
+    static final float elite = 300f;
 
-    Cart cast = new Cart();
-    Wallet wallet = new Wallet();
+    static Scanner input = new Scanner(System.in);
+
+    protected PriorityQueue<Float> coupons;
+
+    protected Cart cart;
+    protected Wallet wallet;
 
     public Boolean login(String pass) {
         return password.equals(pass);
     }
+
+    ///////////////////////////// Menu Methods /////////////////////////////////
+    abstract public void checkOut();
+
+    private void addProdCart() {
+        System.out.print("Enter Product ID: ");
+        String _id = input.nextLine();
+        if (Admin.getProduct(_id) == null) {
+            System.out.println("The entered product ID doesn't exist\nTry Again!!!");
+        }
+
+        System.out.print("Enter the quantity: ");
+        int _quantity = input.nextInt();
+        input.nextLine();
+
+        cart.addItem(Admin.getProduct(_id), _quantity);
+    }
+
+    private void addDealCart() {
+        LinkedList<Deal> deals = Admin.showDeal();
+
+        System.out.print("Enter the deal number which you want to add: ");
+        int _dealNo = input.nextInt();
+        input.nextLine();
+
+        Deal _deal = deals.get(_dealNo - 1);
+
+        if (_deal == null) {
+            System.out.println("Enter the correct deal Number");
+            return;
+        }
+
+        cart.addDeal(_deal);
+    }
+
+    private void viewCoupon() {
+        Iterator<Float> iterator = coupons.iterator();
+        int i = 1;
+        while (iterator.hasNext()) {
+            System.out.println(i + ") " + iterator.next() + "%");
+        }
+    }
+
+    /////////////////////////////// Menu Options ///////////////////////////////
+    /**
+     * Customer menu
+     * 
+     * @return true, to show the menu again else, false
+     */
+    public Boolean customerMenu() {
+        System.out.println("Welcome " + this.name);
+        System.out.println("\tPRESS 1:  To browse Products");
+        System.out.println("\tPRESS 2:  To browse Deals");
+        System.out.println("\tPRESS 3:  To Add a product to cart");
+        System.out.println("\tPRESS 4:  To Add a deal to cart");
+        System.out.println("\tPRESS 5:  To view coupons");
+        System.out.println("\tPRESS 6:  To check Account balance");
+        System.out.println("\tPRESS 7:  To view cart");
+        System.out.println("\tPRESS 8:  To empty cart");
+        System.out.println("\tPRESS 9:  To checkout cart");
+        System.out.println("\tPRESS 10: To Upgrade customer status");
+        System.out.println("\tPRESS 11: To add money to wallet");
+        System.out.println("\tPRESS 12: To go back");
+        System.out.print("Enter your choice: ");
+        int a = input.nextInt();
+        input.nextLine();
+
+        switch (a) {
+            case 1:
+                Admin.productCatalogue();
+                return true;
+            case 2:
+                Admin.showDeal();
+                return true;
+            case 3:
+                addProdCart();
+                return true;
+            case 4:
+                addDealCart();
+                return true;
+            case 5:
+                viewCoupon();
+                return true;
+            case 6:
+                System.out.println("The balance in your account is " + wallet.checkBalance());
+                return true;
+            case 7:
+                cart.viewCart();
+                return true;
+            case 8:
+                cart = new Cart();
+                System.out.println("Cart successfully emptied");
+                return true;
+            case 9:
+                this.checkOut();
+                return true;
+            case 10:
+                // TODO complete this
+                System.out.println("Tiers of subscriptions are:- ");
+                System.out.println("\tPRESS 1: For normal");
+                System.out.println("\tPRESS 2: For prime (₹200pm)");
+                System.out.println("\tPRESS 3: For elite (₹300pm)");
+                System.out.print("Enter your choice: ");
+                int _sub = input.nextInt();
+                input.nextLine();
+
+                return true;
+            case 11:
+                System.out.print("Enter the amount you want to add to the wallet: ");
+                int _amo = input.nextInt();
+                input.nextLine();
+                wallet.addMoney(_amo);
+                return true;
+            case 12:
+                System.out.println("Successfully signed out");
+                return false;
+            default:
+                System.out.println("Enter correct option\nTry Again!!!");
+                return true;
+        }
+
+    }
+
+    ///////////////////////////// Getters Setters //////////////////////////////
+    
+
+    ///////////////////////////////// Helpers //////////////////////////////////
+    protected enum CustomerStatus {
+        NORMAL, PRIME, ELITE
+    }
 }
 
-@SuppressWarnings("unused")
+/////////////////////////////////// Classes ////////////////////////////////////
 class Cart {
-    private int amoOfItems = 0;
+    private float amoOfItems = 0;
     /** Key - Product; Value - Quantity */
     private HashMap<Product, Integer> items = new HashMap<>();
+    private LinkedList<Deal> deals = new LinkedList<>();
 
     public void addItem(Product product, int quantity) {
         if (items.get(product) != null) {
             quantity += items.get(product);
+        }
+
+        if (product.getQuantity() < quantity) {
+            System.out.println("The product is out of stock!!!");
         }
         items.put(product, quantity);
         amoOfItems += product.getPrice() * quantity;
@@ -37,6 +176,39 @@ class Cart {
     public void removeItem(Product product) {
         amoOfItems -= product.getPrice() * items.get(product);
         items.remove(product);
+    }
+
+    public void addDeal(Deal deal) {
+        deals.add(deal);
+        amoOfItems += deal.getPrice();
+    }
+
+    public float totalAmount() {
+        return amoOfItems;
+    }
+
+    public void viewCart() {
+        Boolean flag = false;
+        if (!deals.isEmpty()) {
+            flag = true;
+            System.out.println("The deals in your cart are:-");
+
+            for (Deal deal : deals) {
+                deal.getDetailCart();
+            }
+        }
+
+        if (!items.isEmpty()) {
+            flag = true;
+            System.out.println("\nThe items in your cart are:-");
+            for (Map.Entry<Product, Integer> item : items.entrySet()) {
+                item.getKey().showDetails(item.getValue());
+            }
+        }
+
+        if (!flag) {
+            System.out.println("Your cart is empty");
+        }
     }
 }
 
@@ -67,10 +239,10 @@ class Wallet {
 
 }
 
-class ReverseComparator implements Comparator<Integer> {
+class ReverseComparator implements Comparator<Float> {
 
     @Override
-    public int compare(Integer num1, Integer num2) {
+    public int compare(Float num1, Float num2) {
         int value = num1.compareTo(num2);
         if (value > 0) {
             return -1;
