@@ -21,9 +21,46 @@ public class Flipzon {
 
     }
 
+    /**
+     * Change the subscription of a customer
+     * 
+     * @param curr      current customer object
+     * @param newStatus 1 for normal, 2 for prime, 3 for elite
+     * @return true, if successful, else false
+     */
+    public static Boolean upgradeCustomerStatus(Customer curr, int newStatus) {
+        switch (newStatus) {
+            case 1:
+                if (!curr.getWallet().pay(0 - curr.getCurrentSubscription())) {
+                    System.out.println("Not enough money in the wallet");
+                    return false;
+                }
 
-    public static void upgradeCustomerStatus(Customer current, int newStatus) {
-        
+                customers.put(curr.getEmail(), new Normal(curr.getName(), curr.getAge(), curr.getPhNo(),
+                        curr.getEmail(), curr.getPassword(), curr.getCart(), curr.getWallet(), curr.getCoupons()));
+                return true;
+            case 2:
+                if (!curr.getWallet().pay(200f - curr.getCurrentSubscription())) {
+                    System.out.println("Not enough money in the wallet");
+                    return false;
+                }
+
+                customers.put(curr.getEmail(), new Prime(curr.getName(), curr.getAge(), curr.getPhNo(),
+                        curr.getEmail(), curr.getPassword(), curr.getCart(), curr.getWallet(), curr.getCoupons()));
+                return true;
+            case 3:
+
+                if (!curr.getWallet().pay(300f - curr.getCurrentSubscription())) {
+                    System.out.println("Not enough money in the wallet");
+                    return false;
+                }
+
+                customers.put(curr.getEmail(), new Elite(curr.getName(), curr.getAge(), curr.getPhNo(),
+                        curr.getEmail(), curr.getPassword(), curr.getCart(), curr.getWallet(), curr.getCoupons()));
+                return true;
+            default:
+                return false;
+        }
     }
 
     ///////////////////////////// Menu Methods /////////////////////////////////

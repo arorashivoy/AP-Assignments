@@ -53,6 +53,18 @@ public class Product {
         this.discElite = discElite;
     }
 
+    public float getDiscNormal() {
+        return discNormal;
+    }
+
+    public float getDiscPrime() {
+        return discPrime;
+    }
+
+    public float getDiscElite() {
+        return discElite;
+    }
+
     public int getQuantity() {
         return this.quantity;
     }

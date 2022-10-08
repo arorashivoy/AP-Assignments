@@ -38,4 +38,8 @@ public class Elite extends Customer {
     public void checkOut() {
 
     }
+
+    public float getCurrentSubscription() {
+        return 300f;
+    }
 }

@@ -38,4 +38,8 @@ public class Prime extends Customer {
     public void checkOut() {
 
     }
+
+    public float getCurrentSubscription() {
+        return 200f;
+    }
 }

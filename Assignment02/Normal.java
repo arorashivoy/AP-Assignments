@@ -38,4 +38,8 @@ public class Normal extends Customer {
     public void checkOut() {
         // TODO check product quantity
     }
+
+    public float getCurrentSubscription() {
+        return 0f;
+    }
 }

@@ -119,7 +119,6 @@ public abstract class Customer {
                 this.checkOut();
                 return true;
             case 10:
-                // TODO complete this
                 System.out.println("Tiers of subscriptions are:- ");
                 System.out.println("\tPRESS 1: For normal");
                 System.out.println("\tPRESS 2: For prime (₹200pm)");
@@ -127,6 +126,8 @@ public abstract class Customer {
                 System.out.print("Enter your choice: ");
                 int _sub = input.nextInt();
                 input.nextLine();
+
+                Flipzon.upgradeCustomerStatus(this, _sub);
 
                 return true;
             case 11:
@@ -146,7 +147,39 @@ public abstract class Customer {
     }
 
     ///////////////////////////// Getters Setters //////////////////////////////
-    
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getPhNo() {
+        return phNo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public Wallet getWallet() {
+        return wallet;
+    }
+
+    public PriorityQueue<Float> getCoupons() {
+        return coupons;
+    }
+
+    abstract public float getCurrentSubscription();
 
     ///////////////////////////////// Helpers //////////////////////////////////
     protected enum CustomerStatus {
