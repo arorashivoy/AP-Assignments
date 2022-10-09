@@ -35,8 +35,28 @@ public class Normal extends Customer {
         this.wallet = wallet;
     }
 
-    public void checkOut() {
-        // TODO check product quantity
+    public float checkBalance() {
+        float amount = 0;
+        Iterator<Deal> iterator = cart.getDealIterator();
+        while (iterator.hasNext()) {
+            amount += iterator.next().getPrice();
+        }
+
+        HashMap<Product, Integer> items = cart.getItems();
+
+        for (Map.Entry<Product, Integer> e : items.entrySet()) {
+            float _price = e.getKey().getPrice();
+
+            if (coupons.peek() != null && coupons.peek().compareTo(e.getKey().getDiscNormal()) > 0) {
+                _price -= _price * coupons.poll() / 100;
+            } else {
+                _price -= _price * e.getKey().getDiscNormal() / 100;
+            }
+
+            amount += _price * e.getValue();
+        }
+
+        return amount;
     }
 
     public float getCurrentSubscription() {

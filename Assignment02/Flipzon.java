@@ -59,6 +59,7 @@ public class Flipzon {
                         curr.getEmail(), curr.getPassword(), curr.getCart(), curr.getWallet(), curr.getCoupons()));
                 return true;
             default:
+                System.out.println("Enter correct subscription model");
                 return false;
         }
     }

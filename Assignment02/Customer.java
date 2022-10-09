@@ -24,7 +24,63 @@ public abstract class Customer {
     }
 
     ///////////////////////////// Menu Methods /////////////////////////////////
-    abstract public void checkOut();
+    abstract public float checkBalance();
+
+    public void checkOut() {
+        Iterator<Deal> iterator = cart.getDealIterator();
+        HashMap<Product, Integer> items = cart.getItems();
+
+        // Checking quantity
+        while (iterator.hasNext()) {
+            Deal deal = iterator.next();
+            if (items.get(deal.getProd1()) != null) {
+                if (items.get(deal.getProd1()) + 1 > deal.getProd1().getQuantity()) {
+                    System.out.println("Item " + deal.getProd1().getID() + " is Out of Stock");
+                    return;
+                }
+            } else if (items.get(deal.getProd1()) > deal.getProd1().getQuantity()) {
+                System.out.println("Item " + deal.getProd1().getID() + " is Out of Stock");
+                return;
+            }
+
+            if (items.get(deal.getProd2()) != null) {
+                if (items.get(deal.getProd2()) + 1 > deal.getProd2().getQuantity()) {
+                    System.out.println("Item " + deal.getProd2().getID() + " is Out of Stock");
+                    return;
+                }
+            } else if (items.get(deal.getProd2()) > deal.getProd2().getQuantity()) {
+                System.out.println("Item " + deal.getProd2().getID() + " is Out of Stock");
+                return;
+            }
+        }
+
+        for (Map.Entry<Product, Integer> e : items.entrySet()) {
+            if (e.getKey().getQuantity() < e.getValue()) {
+                System.out.println("Item " + e.getKey().getID() + " is Out of Stock");
+                return;
+            }
+        }
+        // Checking enough balance
+        if (wallet.checkBalance() < this.checkBalance()) {
+            System.out.println("Not enough money in the wallet");
+            return;
+        }
+
+        wallet.pay(this.checkBalance());
+
+        // Reducing the stock
+        Iterator<Deal> iterator1 = cart.getDealIterator();
+
+        while (iterator1.hasNext()) {
+            Deal deal = iterator1.next();
+            deal.getProd1().reduceQuantity(1);
+            deal.getProd2().reduceQuantity(1);
+        }
+
+        for (Map.Entry<Product, Integer> e : items.entrySet()) {
+            e.getKey().reduceQuantity(e.getValue());
+        }
+    }
 
     private void addProdCart() {
         System.out.print("Enter Product ID: ");
@@ -63,6 +119,18 @@ public abstract class Customer {
         while (iterator.hasNext()) {
             System.out.println(i + ") " + iterator.next() + "%");
         }
+    }
+
+    private void changeCustomerStatus() {
+        System.out.println("Tiers of subscriptions are:- ");
+        System.out.println("\tPRESS 1: For normal");
+        System.out.println("\tPRESS 2: For prime (₹200pm)");
+        System.out.println("\tPRESS 3: For elite (₹300pm)");
+        System.out.print("Enter your choice: ");
+        int _sub = input.nextInt();
+        input.nextLine();
+
+        Flipzon.upgradeCustomerStatus(this, _sub);
     }
 
     /////////////////////////////// Menu Options ///////////////////////////////
@@ -109,7 +177,7 @@ public abstract class Customer {
                 System.out.println("The balance in your account is " + wallet.checkBalance());
                 return true;
             case 7:
-                cart.viewCart();
+                cart.viewCart(this);
                 return true;
             case 8:
                 cart = new Cart();
@@ -119,16 +187,7 @@ public abstract class Customer {
                 this.checkOut();
                 return true;
             case 10:
-                System.out.println("Tiers of subscriptions are:- ");
-                System.out.println("\tPRESS 1: For normal");
-                System.out.println("\tPRESS 2: For prime (₹200pm)");
-                System.out.println("\tPRESS 3: For elite (₹300pm)");
-                System.out.print("Enter your choice: ");
-                int _sub = input.nextInt();
-                input.nextLine();
-
-                Flipzon.upgradeCustomerStatus(this, _sub);
-
+                changeCustomerStatus();
                 return true;
             case 11:
                 System.out.print("Enter the amount you want to add to the wallet: ");
@@ -189,7 +248,7 @@ public abstract class Customer {
 
 /////////////////////////////////// Classes ////////////////////////////////////
 class Cart {
-    private float amoOfItems = 0;
+    // private float amoOfItems = 0;
     /** Key - Product; Value - Quantity */
     private HashMap<Product, Integer> items = new HashMap<>();
     private LinkedList<Deal> deals = new LinkedList<>();
@@ -203,24 +262,32 @@ class Cart {
             System.out.println("The product is out of stock!!!");
         }
         items.put(product, quantity);
-        amoOfItems += product.getPrice() * quantity;
+        // amoOfItems += product.getPrice() * quantity;
     }
 
     public void removeItem(Product product) {
-        amoOfItems -= product.getPrice() * items.get(product);
+        // amoOfItems -= product.getPrice() * items.get(product);
         items.remove(product);
     }
 
     public void addDeal(Deal deal) {
         deals.add(deal);
-        amoOfItems += deal.getPrice();
+        // amoOfItems += deal.getPrice();
     }
 
-    public float totalAmount() {
-        return amoOfItems;
+    public Iterator<Deal> getDealIterator() {
+        return deals.iterator();
     }
 
-    public void viewCart() {
+    public HashMap<Product, Integer> getItems() {
+        return items;
+    }
+
+    // public float totalAmount() {
+    // return amoOfItems;
+    // }
+
+    public void viewCart(Customer customer) {
         Boolean flag = false;
         if (!deals.isEmpty()) {
             flag = true;
@@ -242,6 +309,8 @@ class Cart {
         if (!flag) {
             System.out.println("Your cart is empty");
         }
+
+        System.out.println("Your total is ₹" + customer.checkBalance());
     }
 }
 

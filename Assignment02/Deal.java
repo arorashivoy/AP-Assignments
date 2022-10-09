@@ -33,4 +33,12 @@ public class Deal {
     public float getPrice() {
         return price;
     }
+
+    public Product getProd1() {
+        return prod1;
+    }
+
+    public Product getProd2() {
+        return prod2;
+    }
 }

@@ -68,4 +68,8 @@ public class Product {
     public int getQuantity() {
         return this.quantity;
     }
+
+    public void reduceQuantity(int by) {
+        this.quantity -= by;
+    }
 }
