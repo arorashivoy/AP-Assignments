@@ -26,6 +26,10 @@ public abstract class Customer {
     ///////////////////////////// Menu Methods /////////////////////////////////
     abstract public float checkBalance();
 
+    abstract public float deliveryCharge(float amount);
+
+    abstract public void printDeliveryMsg();
+
     public void checkOut() {
         Iterator<Deal> iterator = cart.getDealIterator();
         HashMap<Product, Integer> items = cart.getItems();
@@ -61,12 +65,12 @@ public abstract class Customer {
             }
         }
         // Checking enough balance
-        if (wallet.checkBalance() < this.checkBalance()) {
+        if (wallet.checkBalance() < this.checkBalance() + this.deliveryCharge(this.checkBalance())) {
             System.out.println("Not enough money in the wallet");
             return;
         }
 
-        wallet.pay(this.checkBalance());
+        wallet.pay(this.checkBalance() + this.deliveryCharge(this.checkBalance()));
 
         // Reducing the stock
         Iterator<Deal> iterator1 = cart.getDealIterator();
@@ -80,6 +84,14 @@ public abstract class Customer {
         for (Map.Entry<Product, Integer> e : items.entrySet()) {
             e.getKey().reduceQuantity(e.getValue());
         }
+
+        // Printing Messages
+        System.out.println("Cost of all the products: " + this.checkBalance());
+        System.out.println("Delivery Charges: " + this.deliveryCharge(this.checkBalance()));
+        System.out.println("Total charge: " + (this.checkBalance() + this.deliveryCharge(this.checkBalance())));
+
+        System.out.println("\nOrder Placed.");
+        this.printDeliveryMsg();
     }
 
     private void addProdCart() {
@@ -87,6 +99,7 @@ public abstract class Customer {
         String _id = input.nextLine();
         if (Admin.getProduct(_id) == null) {
             System.out.println("The entered product ID doesn't exist\nTry Again!!!");
+            return;
         }
 
         System.out.print("Enter the quantity: ");
@@ -140,7 +153,7 @@ public abstract class Customer {
      * @return true, to show the menu again else, false
      */
     public Boolean customerMenu() {
-        System.out.println("Welcome " + this.name);
+        System.out.println("\n\nWelcome " + this.name);
         System.out.println("\tPRESS 1:  To browse Products");
         System.out.println("\tPRESS 2:  To browse Deals");
         System.out.println("\tPRESS 3:  To Add a product to cart");

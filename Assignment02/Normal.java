@@ -62,4 +62,12 @@ public class Normal extends Customer {
     public float getCurrentSubscription() {
         return 0f;
     }
+
+    public float deliveryCharge(float amount) {
+        return 100f + ((5 / 100) * amount);
+    }
+
+    public void printDeliveryMsg() {
+        System.out.println("It will be delivered in 7-10 days");
+    }
 }

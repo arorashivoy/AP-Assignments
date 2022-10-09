@@ -112,6 +112,11 @@ public class Flipzon {
         String _phNo = input.nextLine();
         System.out.print("Enter your email id: ");
         String _email = input.nextLine();
+        if (customers.get(_email) != null) {
+            System.out.println("The email ID already exist...Try Again!!!");
+            return;
+        }
+
         String _pass;
 
         if (cnsl == null) {
@@ -204,7 +209,7 @@ public class Flipzon {
      * @return true, to show the menu again else, false
      */
     private static Boolean customerMenuMode() {
-        System.out.println("Welcome to Customer Dashboard");
+        System.out.println("\n\nWelcome to Customer Dashboard");
         System.out.println("\tPRESS 1: To Sign Up");
         System.out.println("\tPRESS 2: To Login");
         System.out.println("\tPRESS 3: To go Back");

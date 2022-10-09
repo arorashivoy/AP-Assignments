@@ -35,7 +35,6 @@ public class Admin {
     }
 
     public void delCategory() {
-        // TODO check if works correctly
         System.out.print("Enter the Category ID: ");
         String _id = input.nextLine();
 
@@ -130,14 +129,20 @@ public class Admin {
     }
 
     public static LinkedList<Deal> showDeal() {
+        Boolean flag = false;
         int i = 1;
         LinkedList<Deal> _deals = new LinkedList<>(deals.values());
         for (Deal deal : _deals) {
+            flag = true;
             System.out.println(i + ") Deal: " + deal.getID());
 
             deal.getDetail();
 
             i += 1;
+        }
+
+        if (!flag) {
+            System.out.println("No deal available");
         }
 
         return _deals;
@@ -150,7 +155,7 @@ public class Admin {
      * @return true, to show the menu again else, false
      */
     public Boolean AdminMenu() {
-        System.out.println("Welcome " + username + "!!!");
+        System.out.println("\n\nWelcome " + username + "!!!");
         System.out.println("\tPRESS 1: To Add Category");
         System.out.println("\tPRESS 2: To Delete Category");
         System.out.println("\tPRESS 3: To Add Product");

@@ -65,4 +65,12 @@ public class Elite extends Customer {
     public float getCurrentSubscription() {
         return 300f;
     }
+
+    public float deliveryCharge(float amount) {
+        return 100f;
+    }
+
+    public void printDeliveryMsg() {
+        System.out.println("It will be delivered within 2 days");
+    }
 }

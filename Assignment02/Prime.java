@@ -65,4 +65,12 @@ public class Prime extends Customer {
     public float getCurrentSubscription() {
         return 200f;
     }
+
+    public float deliveryCharge(float amount) {
+        return 100f + ((2 / 100) * amount);
+    }
+
+    public void printDeliveryMsg() {
+        System.out.println("It will be delivered in 3-6 days");
+    }
 }
