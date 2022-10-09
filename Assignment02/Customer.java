@@ -28,6 +28,8 @@ public abstract class Customer {
 
     abstract public float deliveryCharge(float amount);
 
+    abstract public void addCoupons();
+
     abstract public void printDeliveryMsg();
 
     public void checkOut() {
@@ -65,12 +67,13 @@ public abstract class Customer {
             }
         }
         // Checking enough balance
-        if (wallet.checkBalance() < this.checkBalance() + this.deliveryCharge(this.checkBalance())) {
+        float _amo = this.checkBalance();
+        if (wallet.checkBalance() < _amo + this.deliveryCharge(_amo)) {
             System.out.println("Not enough money in the wallet");
             return;
         }
 
-        wallet.pay(this.checkBalance() + this.deliveryCharge(this.checkBalance()));
+        wallet.pay(_amo + this.deliveryCharge(_amo));
 
         // Reducing the stock
         Iterator<Deal> iterator1 = cart.getDealIterator();
@@ -86,12 +89,17 @@ public abstract class Customer {
         }
 
         // Printing Messages
-        System.out.println("Cost of all the products: " + this.checkBalance());
-        System.out.println("Delivery Charges: " + this.deliveryCharge(this.checkBalance()));
-        System.out.println("Total charge: " + (this.checkBalance() + this.deliveryCharge(this.checkBalance())));
+        System.out.println("Cost of all the products: " + _amo);
+        System.out.println("Delivery Charges: " + this.deliveryCharge(_amo));
+        System.out.println("Total charge: " + (_amo + this.deliveryCharge(_amo)));
 
         System.out.println("\nOrder Placed.");
         this.printDeliveryMsg();
+
+        if (_amo >= 5000) {
+            System.out.println("\n");
+            this.addCoupons();
+        }
     }
 
     private void addProdCart() {

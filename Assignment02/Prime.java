@@ -73,4 +73,16 @@ public class Prime extends Customer {
     public void printDeliveryMsg() {
         System.out.println("It will be delivered in 3-6 days");
     }
+
+    public void addCoupons() {
+        Random random = new Random();
+
+        int noCoupons = random.nextInt(1) + 1;
+
+        for (int i = 0; i < noCoupons; i++) {
+            float _coupon = random.nextInt(10) + 5f;
+            coupons.add(_coupon);
+            System.out.println("Received coupon of " + _coupon + "%");
+        }
+    }
 }

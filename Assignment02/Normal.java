@@ -70,4 +70,8 @@ public class Normal extends Customer {
     public void printDeliveryMsg() {
         System.out.println("It will be delivered in 7-10 days");
     }
+
+    public void addCoupons() {
+
+    }
 }
